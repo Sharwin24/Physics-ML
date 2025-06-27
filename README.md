@@ -1,6 +1,14 @@
 # Physics-ML
 ML Project from a dataset of physics problems and answers.
 
+# Setting up the virtual env
+Run the following to create the virtual environment
+
+```bash
+python3 -m venv .venv # Create virtual environment
+source .venv/bin/activate # Activate the virtual environment
+pip install -r requirements.txt # Install the venv's dependencies
+```
 
 # Dataset (PhysUniBench)
 
