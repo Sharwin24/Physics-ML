@@ -5,6 +5,29 @@ import numpy as np
 MCQ_DATA_PATH = "data/PhysUnivBench_en_MCQ.json"
 OE_DATA_PATH = "data/PhysUnivBench_en_OE.json"
 
+# MCQ JSON Structure
+# {
+#     "id":
+#     "image":
+#     "question":
+#     "subtopic":
+#     "language":
+#     "difficulty"
+#     "options":
+#     "answer":
+#     "parsing":
+# }
+# OE JSON Structure
+# {
+#     "id":
+#     "image":
+#     "question":
+#     "subtopic":
+#     "language":
+#     "difficulty"
+#     "answer":
+# }
+
 
 def load_data(file_path, test_size=0.2, random_state=42):
     """
@@ -24,15 +47,21 @@ def load_data(file_path, test_size=0.2, random_state=42):
     # Load the dataset
     data = pd.read_json(file_path)
 
-    # Assuming the last column is the target variable
-    X = data.iloc[:, :-1]
-    y = data.iloc[:, -1]
-
+    # Check if the dataset is MCQ or OE based on the presence of 'options'
+    if 'options' in data.columns:
+        # MCQ dataset
+        X = data[['id', 'image', 'question', 'subtopic',
+                  'language', 'difficulty', 'options']]
+        y = data['answer']
+    else:
+        # OE dataset
+        X = data[['id', 'image', 'question',
+                  'subtopic', 'language', 'difficulty']]
+        y = data['answer']
     # Split the dataset into training and testing sets
     X_train, X_test, y_train, y_test = train_test_split(
         X, y, test_size=test_size, random_state=random_state
     )
-
     return X_train, X_test, y_train, y_test
 
 
