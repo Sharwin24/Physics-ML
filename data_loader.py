@@ -29,6 +29,20 @@ OE_DATA_PATH = "data/PhysUnivBench_en_OE.json"
 # }
 
 
+def get_option_in_english(option: str, options: str) -> str:
+    # Option is either ["A", "B", "C", "D"]
+    # options is a string of form:
+    # "A. <text> \n\nB. <text> \n\nC. \n\nD. <text>",
+    # This function should return <text> corresponding to the option
+    answer_dict = {}
+    options_list = options.split('\n\n')
+    for option in options_list:
+        if option.strip():
+            key, value = option.split('. ', 1)
+            answer_dict[key.strip()] = value.strip()
+    return answer_dict.get(option.strip(), np.nan)
+
+
 def load_data(file_path, test_size=0.2, random_state=42):
     """
     Load data from a JSON file and split it into training and testing sets.
@@ -52,12 +66,13 @@ def load_data(file_path, test_size=0.2, random_state=42):
         # MCQ dataset
         X = data[['id', 'image', 'question', 'subtopic',
                   'language', 'difficulty', 'options']]
-        y = data['answer']
+        y = get_option_in_english(data['answer'])
     else:
         # OE dataset
         X = data[['id', 'image', 'question',
                   'subtopic', 'language', 'difficulty']]
         y = data['answer']
+
     # Split the dataset into training and testing sets
     X_train, X_test, y_train, y_test = train_test_split(
         X, y, test_size=test_size, random_state=random_state
@@ -68,7 +83,7 @@ def load_data(file_path, test_size=0.2, random_state=42):
 if __name__ == "__main__":
     for path in [MCQ_DATA_PATH, OE_DATA_PATH]:
         print(f"Loading data from {path}...")
-        X_train, X_test, y_train, y_test = load_data(MCQ_DATA_PATH)
+        X_train, X_test, y_train, y_test = load_data(path)
 
         print("\tTraining features shape:", X_train.shape)
         print("\tTesting features shape:", X_test.shape)
