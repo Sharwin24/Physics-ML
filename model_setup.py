@@ -2,7 +2,7 @@ import os
 import base64
 from PIL import Image
 from io import BytesIO
-from transformers import CLIPProcessor, CLIPModel,  SentencePieceTokenizer, AutoTokenizer
+from transformers import CLIPProcessor, CLIPModel, AutoTokenizer
 import torch
 
 def model_setup():
@@ -50,6 +50,9 @@ def model_setup():
                 print(f"Failed to embed {filename}: {embed_error}")
 
     # tokenizer
+    tokenizer = AutoTokenizer.from_pretrained("google/mt5-small")
+    
+
 
     
 
