@@ -4,9 +4,9 @@ from PIL import Image
 from io import BytesIO
 from transformers import CLIPProcessor, CLIPModel, AutoTokenizer
 import torch
+import json
 
 def model_setup():
-    #image embedding
     print(os.path.abspath("data/images"))
     clip_model_id = "openai/clip-vit-base-patch32"
     clip_model = CLIPModel.from_pretrained(clip_model_id)
@@ -51,6 +51,17 @@ def model_setup():
 
     # tokenizer
     tokenizer = AutoTokenizer.from_pretrained("google/mt5-small")
+
+    json_file = 'data/PhysUnivBench_en_unified.json'
+    #iterate through json file and tokenize every entry
+    with open(json_file, 'r', encoding='utf-8') as f:
+        data = json.load(f)
+        texts = [str(entry) for entry in data]
+    #tokenize all texts at once
+    tokenized_texts = tokenizer(texts, padding=True, truncation=True, return_tensors="pt")
+    print(tokenized_texts['input_ids'].shape)
+    
+
     
 
 
@@ -63,10 +74,5 @@ def model_setup():
 
 
 
-    # Set the model (you can also try llava-hf/llava-1.5-13b-hf or others)
-    # model_id = "llava-hf/llava-1.5-7b-hf"
-
-    # model = LlavaForConditionalGeneration.from_pretrained(
-    #     model_id, torch_dtype=torch.float16, device_map="auto"
-    # )
+  
 print(model_setup())
