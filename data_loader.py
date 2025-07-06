@@ -1,3 +1,5 @@
+import os
+import json
 import pandas as pd
 from sklearn.model_selection import train_test_split
 import numpy as np
@@ -13,7 +15,7 @@ UNIFIED_DATA_PATH = "data/PhysUnivBench_en_unified.json"
 #     "question":
 #     "subtopic":
 #     "language":
-#     "difficulty"
+#     "difficulty":
 #     "options":
 #     "answer":
 #     "parsing":
@@ -25,7 +27,7 @@ UNIFIED_DATA_PATH = "data/PhysUnivBench_en_unified.json"
 #     "question":
 #     "subtopic":
 #     "language":
-#     "difficulty"
+#     "difficulty":
 #     "answer":
 # }
 # Unified JSON Structure
@@ -122,6 +124,69 @@ def create_unified_json(MCQ_DATA_PATH: str, OE_DATA_PATH: str, output_path: str)
     unified_data.to_json(output_path, orient='records', indent=2)
 
 
+def create_fine_tuning_json(MCQ_DATA_PATH: str, OE_DATA_PATH: str,
+                            mcq_out_path="data/llava_finetune_mcq.json",
+                            oe_out_path="data/llava_finetune_oe.json"):
+    """
+    Converts MCQ and OE datasets into LLaVA fine-tuning format.
+    Generates two JSON files with image-text conversation pairs.
+
+    Args:
+        MCQ_DATA_PATH: Path to MCQ JSON
+        OE_DATA_PATH: Path to OE JSON
+        mcq_out_path: Output path for MCQ fine-tune JSON
+        oe_out_path: Output path for OE fine-tune JSON
+    """
+    mcq_data = pd.read_json(MCQ_DATA_PATH)
+    oe_data = pd.read_json(OE_DATA_PATH)
+
+    fine_tune_mcq = []
+    fine_tune_oe = []
+
+    for _, row in mcq_data.iterrows():
+        image_path = 'images/' + row.get("image", "").strip()
+        question = row.get("question", "").strip()
+        options = row.get("options", "").strip()
+        answer_key = row.get("answer", "").strip()
+        explanation = get_option_in_english(answer_key, options)
+
+        prompt = f"Which of the following options is correct?\n{options}"
+        answer = f"The correct answer is {answer_key} because {explanation}."
+
+        fine_tune_mcq.append({
+            "image": image_path,
+            "conversations": [
+                {"from": "human", "value": question + "\n" + prompt},
+                {"from": "gpt", "value": answer}
+            ]
+        })
+
+    for _, row in oe_data.iterrows():
+        image_path = 'images/' + row.get("image", "").strip()
+        question = row.get("question", "").strip()
+        answer = row.get("answer", "").strip()
+
+        fine_tune_oe.append({
+            "image": image_path,
+            "conversations": [
+                {"from": "human", "value": question},
+                {"from": "gpt", "value": answer}
+            ]
+        })
+
+    # Save to disk
+    os.makedirs(os.path.dirname(mcq_out_path), exist_ok=True)
+    with open(mcq_out_path, "w") as f:
+        json.dump(fine_tune_mcq, f, indent=2)
+
+    with open(oe_out_path, "w") as f:
+        json.dump(fine_tune_oe, f, indent=2)
+
+    print(
+        f"Saved fine-tuning data:\n  MCQ: {mcq_out_path}\n  OE: {oe_out_path}"
+    )
+
+
 def load_data(file_path, test_size=0.2, random_state=42):
     """
     Load data from a unified JSON file and split it into training and testing sets.
@@ -173,3 +238,9 @@ if __name__ == "__main__":
     print("Training and testing sets created successfully.")
     print(f"X_train shape: {X_train.shape}, y_train shape: {y_train.shape}")
     print(f"X_test shape: {X_test.shape}, y_test shape: {y_test.shape}")
+
+    # Create fine-tuning JSON files
+    create_fine_tuning_json(MCQ_DATA_PATH, OE_DATA_PATH,
+                            mcq_out_path="data/llava_finetune_mcq.json",
+                            oe_out_path="data/llava_finetune_oe.json")
+    print("Fine-tuning JSON files created successfully.")
