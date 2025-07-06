@@ -144,7 +144,7 @@ def create_fine_tuning_json(MCQ_DATA_PATH: str, OE_DATA_PATH: str,
     fine_tune_oe = []
 
     for _, row in mcq_data.iterrows():
-        image_path = 'images/' + row.get("image", "").strip()
+        image_path = row.get("image", "").strip()
         question = row.get("question", "").strip()
         options = row.get("options", "").strip()
         answer_key = row.get("answer", "").strip()
@@ -162,7 +162,7 @@ def create_fine_tuning_json(MCQ_DATA_PATH: str, OE_DATA_PATH: str,
         })
 
     for _, row in oe_data.iterrows():
-        image_path = 'images/' + row.get("image", "").strip()
+        image_path = row.get("image", "").strip()
         question = row.get("question", "").strip()
         answer = row.get("answer", "").strip()
 
