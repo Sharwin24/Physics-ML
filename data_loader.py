@@ -234,6 +234,7 @@ def load_data(file_path, test_size=0.2, random_state=42):
 # Create a Train-Test split and create new MCQ_Train, OE_Train, MCQ_Test, OE_Test JSON files
 # Convert to a format suitable for LLaVA fine-tuning
 
+
 if __name__ == "__main__":
     # Create the unified JSON file
     create_unified_json(MCQ_DATA_PATH, OE_DATA_PATH, UNIFIED_DATA_PATH)
