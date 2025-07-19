@@ -9,10 +9,10 @@ from transformers.trainer import (
     is_sagemaker_mp_enabled,
     get_parameter_names,
     has_length,
-    ALL_LAYERNORM_LAYERS,
     logger,
 )
 from typing import List, Optional
+from transformers.pytorch_utils import ALL_LAYERNORM_LAYERS
 
 
 def maybe_zero_3(param, ignore_status=False, name=None):
