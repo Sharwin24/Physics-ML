@@ -37,4 +37,5 @@ deepspeed llava/train/train_mem.py \
     --dataloader_num_workers 0 \
     --lazy_preprocess True \
     --report_to wandb \
-    --deepspeed scripts/zero3_offload.json
+    --deepspeed /Users/vipulpandey/Desktop/Physics-ML/scripts/zero3_offload.json
+
