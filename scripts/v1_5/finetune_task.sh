@@ -3,7 +3,7 @@
 #!/bin/bash
 
 deepspeed llava/train/train_mem.py \
-    --model_name_or_path liuhaotian/llava-v1.5-7b \
+    --model_name_or_path liuhaotian/llava-v1.5-3b \
     --version v1 \
     --data_path data/llava_finetune_mcq_train.json \
     --image_folder data/images \
@@ -19,7 +19,7 @@ deepspeed llava/train/train_mem.py \
     --num_train_epochs 1 \
     --per_device_train_batch_size 1 \
     --per_device_eval_batch_size 4 \
-    --gradient_accumulation_steps 1 \
+    --gradient_accumulation_steps 4 \
     --evaluation_strategy "no" \
     --save_strategy "steps" \
     --save_steps 50000 \
@@ -30,8 +30,9 @@ deepspeed llava/train/train_mem.py \
     --lr_scheduler_type "cosine" \
     --logging_steps 1 \
     --tf32 False \
-    --model_max_length 2048 \
+    --model_max_length 1024 \
     --gradient_checkpointing True \
-    --dataloader_num_workers 4 \
+    --dataloader_num_workers 0 \
     --lazy_preprocess True \
-    --report_to wandb
+    --report_to wandb \
+    --deepspeed llava/scripts/zero3_offload.json
