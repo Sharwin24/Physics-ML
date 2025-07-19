@@ -2,6 +2,8 @@
 
 #!/bin/bash
 
+# ffhe
+
 deepspeed llava/train/train_mem.py \
     --model_name_or_path liuhaotian/llava-v1.5-3b \
     --version v1 \
